@@ -1,0 +1,227 @@
+{
+  "info": {
+    "_postman_id": "ba3cf25b-7dd4-4065-b8f6-95124322b714",
+    "name": "football-data.org v4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "13996703",
+    "_collection_link": "https://go.postman.co/collection/13996703-ba3cf25b-7dd4-4065-b8f6-95124322b714?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Competition",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "user-agent": true
+        }
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions/PL/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions",
+            "PL",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Competition List",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions"
+          ],
+          "query": [
+            {
+              "key": "season",
+              "value": "2025",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Competition / Standings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions/2000/standings",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions",
+            "2000",
+            "standings"
+          ],
+          "query": [
+            {
+              "key": "season",
+              "value": "2025",
+              "disabled": true
+            },
+            {
+              "key": "matchday",
+              "value": "3",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Competition / Matches",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions/2000/matches",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions",
+            "2000",
+            "matches"
+          ],
+          "query": [
+            {
+              "key": "matchday",
+              "value": "23",
+              "disabled": true
+            },
+            {
+              "key": "dateFrom",
+              "value": "2026-04-04",
+              "disabled": true
+            },
+            {
+              "key": "dateTo",
+              "value": "2026-04-04",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Competition / Teams",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions/2000/teams",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions",
+            "2000",
+            "teams"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Competition / Scorer",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/v4/competitions/PL/scorers",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "v4",
+            "competitions",
+            "PL",
+            "scorers"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "037b651b2f784c3d80b6396ec89f7ebe",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "X-Auth-Token",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "https://api.football-data.org/"
+    }
+  ]
+}
