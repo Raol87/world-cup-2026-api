@@ -5,6 +5,7 @@ import {
   fetchMatches,
   fetchTeams,
   fetchScorers,
+  fetchTodayMatches,
 } from "./externalApi";
 
 // World Cup competition ID on football-data.org
@@ -186,6 +187,84 @@ async function syncScorers(timestamp: string): Promise<number> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Today's matches — ephemeral table, only keeps current day
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function syncTodayMatches(): Promise<{ synced: number; deleted: number }> {
+  const today = new Date().toISOString().slice(0, 10);
+  const timestamp = new Date().toISOString();
+
+  // Drop any rows that are not from today
+  const { count: deleted, error: deleteError } = await supabase
+    .from("fd_today_matches")
+    .delete({ count: "exact" })
+    .neq("match_date", today);
+
+  if (deleteError) throw new Error(`today_matches delete: ${deleteError.message}`);
+
+  // Fetch and upsert today's matches
+  const data = await fetchTodayMatches();
+
+  const rows = data.matches.map((m) => ({
+    id: m.id,
+    utc_date: m.utcDate,
+    status: m.status,
+    matchday: m.matchday ?? null,
+    stage: m.stage,
+    group: m.group ?? null,
+    last_updated: m.lastUpdated,
+    // home team
+    home_team_id: m.homeTeam.id,
+    home_team_name: m.homeTeam.name,
+    home_team_short_name: m.homeTeam.shortName ?? null,
+    home_team_tla: m.homeTeam.tla ?? null,
+    home_team_crest: m.homeTeam.crest ?? null,
+    // away team
+    away_team_id: m.awayTeam.id,
+    away_team_name: m.awayTeam.name,
+    away_team_short_name: m.awayTeam.shortName ?? null,
+    away_team_tla: m.awayTeam.tla ?? null,
+    away_team_crest: m.awayTeam.crest ?? null,
+    // score
+    winner: m.score.winner ?? null,
+    duration: m.score.duration,
+    full_time_home: m.score.fullTime.home ?? null,
+    full_time_away: m.score.fullTime.away ?? null,
+    half_time_home: m.score.halfTime.home ?? null,
+    half_time_away: m.score.halfTime.away ?? null,
+    // referees stored as JSON array
+    referees: m.referees ?? [],
+    // competition
+    competition_id: m.competition?.id ?? null,
+    competition_name: m.competition?.name ?? null,
+    competition_code: m.competition?.code ?? null,
+    competition_type: m.competition?.type ?? null,
+    competition_emblem: m.competition?.emblem ?? null,
+    // area
+    area_id: m.area?.id ?? null,
+    area_name: m.area?.name ?? null,
+    area_code: m.area?.code ?? null,
+    area_flag: m.area?.flag ?? null,
+    // season
+    season_id: m.season?.id ?? null,
+    season_start_date: m.season?.startDate ?? null,
+    season_end_date: m.season?.endDate ?? null,
+    season_current_matchday: m.season?.currentMatchday ?? null,
+    // metadata
+    match_date: today,
+    synced_at: timestamp,
+  }));
+
+  const { error: upsertError, count: synced } = await supabase
+    .from("fd_today_matches")
+    .upsert(rows, { onConflict: "id", count: "exact" });
+
+  if (upsertError) throw new Error(`today_matches upsert: ${upsertError.message}`);
+
+  return { synced: synced ?? rows.length, deleted: deleted ?? 0 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Master sync — runs all endpoints, collects results
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -202,6 +281,7 @@ export async function runSync(): Promise<SyncResult> {
     { name: "standings",    fn: () => syncStandings(timestamp) },
     { name: "matches",      fn: () => syncMatches(timestamp) },
     { name: "scorers",      fn: () => syncScorers(timestamp) },
+    { name: "today_matches", fn: () => syncTodayMatches().then((r) => r.synced) },
   ];
 
   for (const task of tasks) {

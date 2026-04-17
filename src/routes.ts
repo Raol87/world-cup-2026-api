@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { supabase } from "./supabaseClient";
+import { syncTodayMatches } from "./sync";
 
 const router = Router();
 
@@ -144,6 +145,37 @@ router.get("/scorers", async (req: Request, res: Response) => {
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
   return res.json(data);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Today's Matches
+// GET  /api/today-matches         — read cached today's matches from DB
+// POST /api/today-matches/sync    — fetch from football-data.org and refresh DB
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.get("/today-matches", async (_req: Request, res: Response) => {
+  const { data, error } = await supabase
+    .from("fd_today_matches")
+    .select("*")
+    .order("utc_date", { ascending: true });
+
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json(data);
+});
+
+router.post("/today-matches/sync", async (_req: Request, res: Response) => {
+  try {
+    const result = await syncTodayMatches();
+    return res.json({
+      success: true,
+      synced: result.synced,
+      deleted: result.deleted,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return res.status(500).json({ success: false, error: message });
+  }
 });
 
 export default router;

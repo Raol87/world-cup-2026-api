@@ -113,6 +113,57 @@ create table if not exists fd_scorers (
   primary key (competition_id, season_id, player_id)
 );
 
+-- Today's Matches (ephemeral — only stores the current day's matches)
+create table if not exists fd_today_matches (
+  id                        integer primary key,
+  utc_date                  timestamptz,
+  status                    text,
+  matchday                  integer,
+  stage                     text,
+  "group"                   text,
+  last_updated              timestamptz,
+  -- home team
+  home_team_id              integer,
+  home_team_name            text,
+  home_team_short_name      text,
+  home_team_tla             text,
+  home_team_crest           text,
+  -- away team
+  away_team_id              integer,
+  away_team_name            text,
+  away_team_short_name      text,
+  away_team_tla             text,
+  away_team_crest           text,
+  -- score
+  winner                    text,
+  duration                  text,
+  full_time_home            integer,
+  full_time_away            integer,
+  half_time_home            integer,
+  half_time_away            integer,
+  -- referees (array of {id, name, type, nationality} objects)
+  referees                  jsonb,
+  -- competition
+  competition_id            integer,
+  competition_name          text,
+  competition_code          text,
+  competition_type          text,
+  competition_emblem        text,
+  -- area
+  area_id                   integer,
+  area_name                 text,
+  area_code                 text,
+  area_flag                 text,
+  -- season
+  season_id                 integer,
+  season_start_date         date,
+  season_end_date           date,
+  season_current_matchday   integer,
+  -- metadata
+  match_date                date not null,
+  synced_at                 timestamptz
+);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Optional: useful indexes
 -- ─────────────────────────────────────────────────────────────────────────────

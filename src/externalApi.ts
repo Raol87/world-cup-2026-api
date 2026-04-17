@@ -65,3 +65,8 @@ export async function fetchTeams(competitionId: number | string): Promise<TeamsR
 export async function fetchScorers(competitionId: number | string): Promise<ScorersResponse> {
   return footballFetch<ScorersResponse>(`/v4/competitions/${competitionId}/scorers`);
 }
+
+/** GET /v4/matches — today's matches across all competitions (API returns today by default) */
+export async function fetchTodayMatches(): Promise<MatchesResponse> {
+  return footballFetch<MatchesResponse>("/v4/matches");
+}
